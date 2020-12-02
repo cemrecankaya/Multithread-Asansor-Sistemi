@@ -32,6 +32,16 @@ namespace Multithreat_Elevator
         {//Kat kuyruğu listesini döndürür.
             return this.floorQueue;
         }
+        public int getTotalPersonInQueue()
+        {
+            int count = 0;
+            foreach(string temp in this.floorQueue)
+            {
+                string[] text = temp.Split('-');
+                count += int.Parse(text[0]);
+            }
+            return count;
+        }
         #endregion
 
         #region SET
@@ -54,12 +64,14 @@ namespace Multithreat_Elevator
         /// (-) Negatif değer girildiğinde girilen değer kadar azaltır. 
         /// (+) Pozitif değer girildiğinde girilen değer kadar arttırır.
         /// </summary>          
-        public void updateActivePersonCount(int number)
-        { 
-            if (number < 0)
-                this.activePersonCount -= number;
-            else
-                this.activePersonCount += number;
+        public void updateActivePersonCount(char oper,int number)
+        {
+            switch (oper)
+            {
+                case '+': this.activePersonCount += number; break;
+                case '-': this.activePersonCount -= number; break;
+            }
+                
         }
         public void addFloorQueue(string text)
         {//Kuyruğun sonuna ekleme yapar

@@ -9,7 +9,7 @@ namespace Multithreat_Elevator
     class Elevator
     {
         private readonly int capacity = 10; // Asansör kapasitesi
-        private readonly int TransitionSpeed = 200; // Katlar arası geçiş süresi
+        private readonly int transitionSpeed = 200; // Katlar arası geçiş süresi
         private string mode; // Çalışma durumu  :  true = Working = Çalışıyor, false = Idle = Boşta 
         private int activeFloor; // Aktif olarak bulunduğu kat
         private int destinationFloor; // Hedeflediği kat
@@ -59,7 +59,7 @@ namespace Multithreat_Elevator
         }
         public int getTransitionSpeed()
         {// Asansör kat arası geçiş hızını döndürür.
-            return TransitionSpeed;
+            return this.transitionSpeed;
         }
         #endregion
 

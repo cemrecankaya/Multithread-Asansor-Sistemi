@@ -46,7 +46,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="elevator.cs" />
+    <Compile Include="Avmfloor.cs" />
+    <Compile Include="Elevator.cs" />
     <Compile Include="elevatorUI.cs">
       <SubType>Form</SubType>
     </Compile>
