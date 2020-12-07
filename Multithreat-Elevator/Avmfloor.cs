@@ -10,13 +10,16 @@ namespace Multithreat_Elevator
     {
         private int floorNumber; // Kat numarası
         private int activePersonCount; // Katta aktif olarak bulunan kişi sayısı
+        private int leavingPersonCount; // Kattan ayrılan kişi sayısı
         private Queue<string> floorQueue; // Katta bulunan asansör kuyruğu
+        private List<string> log;
 
         public Avmfloor(int floorNumber)
         {
             this.floorNumber = floorNumber;
             this.activePersonCount = 0;
             floorQueue = new Queue<string>();
+            this.log = new List<string>();
         }
         
         #region GET
@@ -32,15 +35,24 @@ namespace Multithreat_Elevator
         {//Kat kuyruğu listesini döndürür.
             return this.floorQueue;
         }
+        public int getLeavingPersonCount()
+        {//Kattan ayrılan kişi sayısını döndürür.
+            return this.leavingPersonCount;
+        }
         public int getTotalPersonInQueue()
         {
+            Queue<string> tempQueue = new Queue<string>(this.floorQueue);
             int count = 0;
-            foreach(string temp in this.floorQueue)
+            foreach(string temp in tempQueue)
             {
                 string[] text = temp.Split('-');
                 count += int.Parse(text[0]);
             }
             return count;
+        }
+        public List<string> getLog()
+        {
+            return this.log;
         }
         #endregion
 
@@ -56,6 +68,14 @@ namespace Multithreat_Elevator
         {//Katta aktif olarak bulunan kişi sayısını belirler.
             this.activePersonCount = activePersonCount;
         }
+        public void setLeavingPersonCount(int leavingPersonCount)
+        {//Kattan ayrılan kişi sayısını belirler.
+            this.leavingPersonCount = leavingPersonCount;
+        }
+        public void setLog(string text)
+        {
+            this.log.Add(text);
+        }
         #endregion
 
         #region UPDATE
@@ -70,6 +90,15 @@ namespace Multithreat_Elevator
             {
                 case '+': this.activePersonCount += number; break;
                 case '-': this.activePersonCount -= number; break;
+            }
+                
+        }
+        public void updateLeavingPersonCount(char oper,int number)
+        {
+            switch (oper)
+            {
+                case '+': this.leavingPersonCount += number; break;
+                case '-': this.leavingPersonCount -= number; break;
             }
                 
         }
