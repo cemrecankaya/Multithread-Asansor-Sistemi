@@ -1,0 +1,10 @@
+C:\Users\Cemre\Documents\GitHub\Multithread-Asans-r-Sistemi\Multithread-Elevator\Multithread-Elevator\obj\Debug\MultithreadElevator.csprojAssemblyReference.cache
+C:\Users\Cemre\Documents\GitHub\Multithread-Asans-r-Sistemi\Multithread-Elevator\Multithread-Elevator\obj\Debug\MultithreadElevator.Properties.Resources.resources
+C:\Users\Cemre\Documents\GitHub\Multithread-Asans-r-Sistemi\Multithread-Elevator\Multithread-Elevator\obj\Debug\MultithreadElevator.csproj.GenerateResource.cache
+C:\Users\Cemre\Documents\GitHub\Multithread-Asans-r-Sistemi\Multithread-Elevator\Multithread-Elevator\obj\Debug\MultithreadElevator.csproj.CoreCompileInputs.cache
+C:\Users\Cemre\Documents\GitHub\Multithread-Asans-r-Sistemi\Multithread-Elevator\Multithread-Elevator\bin\Debug\Multithread-Elevator.exe.config
+C:\Users\Cemre\Documents\GitHub\Multithread-Asans-r-Sistemi\Multithread-Elevator\Multithread-Elevator\bin\Debug\Multithread-Elevator.exe
+C:\Users\Cemre\Documents\GitHub\Multithread-Asans-r-Sistemi\Multithread-Elevator\Multithread-Elevator\bin\Debug\Multithread-Elevator.pdb
+C:\Users\Cemre\Documents\GitHub\Multithread-Asans-r-Sistemi\Multithread-Elevator\Multithread-Elevator\obj\Debug\Multithread-Elevator.exe
+C:\Users\Cemre\Documents\GitHub\Multithread-Asans-r-Sistemi\Multithread-Elevator\Multithread-Elevator\obj\Debug\Multithread-Elevator.pdb
+C:\Users\Cemre\Documents\GitHub\Multithread-Asans-r-Sistemi\Multithread-Elevator\Multithread-Elevator\obj\Debug\MultithreadElevator.UI.elevatorScreen.resources
