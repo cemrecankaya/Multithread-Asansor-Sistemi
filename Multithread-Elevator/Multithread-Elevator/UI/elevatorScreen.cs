@@ -25,7 +25,7 @@ namespace MultithreadElevator.UI
         private int avmLoginSpeed = 500; // login thread çalışma aralığı
         private int avmExitSpeed = 1000; // exit thread çalışma aralığı
         private int queueDesintySpeed = 50; // exit thread çalışma aralığı
-        private int refreshUISpeed = 100; // refreshUI thread çalışma aralığı
+        private int refreshUISpeed = 50; // refreshUI thread çalışma aralığı
         private int sleepSpeedController = 100; // Thread hızları Yüzde kaç arttırılacak
         #endregion
         #region LIST OF ALL
@@ -51,6 +51,12 @@ namespace MultithreadElevator.UI
         {
             InitializeComponent();
             Control.CheckForIllegalCrossThreadCalls = false;
+            th_elevator0 = new Thread(new ThreadStart(() => elevator(0)));
+            th_elevator1 = new Thread(new ThreadStart(() => elevator(1)));
+            th_elevator2 = new Thread(new ThreadStart(() => elevator(2)));
+            th_elevator3 = new Thread(new ThreadStart(() => elevator(3)));
+            th_elevator4 = new Thread(new ThreadStart(() => elevator(4)));
+
             avmFloorList = new List<AvmFloor>{
                 new AvmFloor(0),
                 new AvmFloor(1),
@@ -185,7 +191,7 @@ namespace MultithreadElevator.UI
                     int temptargetFloor = rand.Next(1, 5);
                     avmFloorList[0].addFloorQueue(tempPersonCount, temptargetFloor);
                     avmFloorList[0].updateActivePersonCount('+', tempPersonCount);
-                    avmFloorList[0].setLog("[+] "+tempPersonCount + "-" + temptargetFloor);
+                    avmFloorList[0].setLog("[+] " + tempPersonCount + "-" + temptargetFloor);
                     count++;
                 }
                 Thread.Sleep(avmLoginSpeed);
@@ -233,41 +239,46 @@ namespace MultithreadElevator.UI
         private void queueDensityControl()
         {
             int count = 0;
+            bool controlstart = false;
+            bool controlstop = false;
             while (queueControlIsActive)
             {
                 lock (this)
                 {
                     int allPersonCount = 0;
-                    int allCapacity = 0;
 
                     // Tüm katlarda toplam kuyruktaki kişi sayısı ve toplam aktif asansör kapasitesi
                     for (int i = 0; i < 5; i++)
                     {
                         allPersonCount += avmFloorList[i].getTotalPersonInQueue();
-                        if (elevatorList[i].getStatus() == true)
-                        {
-                            allCapacity += elevatorList[i].getCapacity();
-                        }
                     }
+                    
+                    if (allPersonCount<=20)
+                        controlstart = false;
+                    if (allPersonCount >= 10)
+                        controlstop = false;
+
                     // Tüm katlarda sırada bulunan toplam kişi sayısı aktif asansörlerin kapasitesinin iki katından fazla ise 1 tane asansör başlat
-                    if (allPersonCount > (allCapacity * 2))
+                    if (allPersonCount > 20 && controlstart == false)
                     {
                         for (int i = 1; i < 5; i++)
                         {
                             if (elevatorList[i].getStatus() == false)
                             {
+                                controlstart = true;
                                 elevatorStart(i);
                                 break;
                             }
                         }
                     }
                     // Tüm katlarda sırada bulunan toplam kişi sayısı aktif asansörlerin kapasitesinin altında ise 1 asansör kapat
-                    if (allPersonCount < (allCapacity-elevatorList[0].getCapacity()))
+                    if (allPersonCount < 10 && controlstop == false)
                     {
                         for (int i = 4; i > 0; i--)
                         {
                             if (elevatorList[i].getStatus() == true)
                             {
+                                controlstop = true;
                                 elevatorStop(i);
                                 break;
                             }
@@ -292,6 +303,7 @@ namespace MultithreadElevator.UI
                     {
                         allQueueCount += avmFloorList[i].getTotalPersonInQueue();
                         logListbox[i].Items.Clear();
+                        elevatorRefreshUI(i);
                         foreach(string temp in avmFloorList[i].getLog())
                         {
                             logListbox[i].Items.Add(temp);
@@ -334,15 +346,13 @@ namespace MultithreadElevator.UI
         #region ELEVATORS
         private void elevator(int num)
         {
+            Thread.Sleep(200);
             while(elevatorList[num].getMode() == true)
             {
                 lock (this)
                 {
                     if (elevatorList[num].getStatus() == true)
                     {
-                        // Asansörden inecekleri indir.
-                        elevatorUnloadPerson(num);
-
                         // Asansörün hedef yönünü belirle.
                         elevatorList[num].elevatorSetDirection(avmFloorList);
 
@@ -369,15 +379,8 @@ namespace MultithreadElevator.UI
                     //Asansör deaktif edildi ve asansörün içerisinde yolcu varsa onları indirip 0. kata git
                     else if (elevatorList[num].getStatus() == false)
                     {
-                        // Asansörden inecekleri indir.
-                        elevatorUnloadPerson(num);
-
                         // Asansörün hedef yönünü belirle.
                         elevatorList[num].elevatorSetDirection(avmFloorList);
-
-                        // Asansöre binecekleri bindir.
-                        if (elevatorList[num].getActiveFloor() == 0 || elevatorList[num].getDirectionFloor() == false)
-                            elevatorLoadPerson(num);
 
                         // Hedef belirle.
                         elevatorList[num].elevatorSetDestination(avmFloorList);
@@ -415,7 +418,8 @@ namespace MultithreadElevator.UI
             {
                 elevatorList[num].setMode(true);
                 elevThreadList[num] = new Thread(new ThreadStart(() => elevator(num)));
-                elevThreadList[num].Name = "Elevator" + num; elevatorList[num].setStatus(true);
+                elevThreadList[num].Name = "Elevator" + num; 
+                elevatorList[num].setStatus(true);
                 elevThreadList[num].Start();
             }
         }
@@ -462,9 +466,20 @@ namespace MultithreadElevator.UI
                 if ((temp[0] + elevatorList[num].getTotalPersonInside()) <= elevatorList[0].getCapacity())
                 {
                     avmFloorList[elevatorList[num].getActiveFloor()].removeFloorQueue();
-                    avmFloorList[elevatorList[num].getActiveFloor()].setLog("[-] " + temp[0] + "-" + temp[1]);
+                    avmFloorList[elevatorList[num].getActiveFloor()].setLog("[-] " + temp[0] + "-" + temp[1] + " " + num + ". Asansör tarafından alındı.");
                     elevatorList[num].addInsideList(temp[0], temp[1]);
                     elevatorList[num].updateTotalPersonInside('+', temp[0]);
+                }
+                else if ((temp[0] + elevatorList[num].getTotalPersonInside()) > elevatorList[0].getCapacity())
+                {
+                    int remainingPersonCount = (temp[0] + elevatorList[num].getTotalPersonInside()) - 10;
+                    int enteringPersonCount = temp[0] - remainingPersonCount;
+
+                    avmFloorList[elevatorList[num].getActiveFloor()].getFloorQueue().Peek()[0] = remainingPersonCount;
+                    elevatorList[num].addInsideList(enteringPersonCount, temp[1]);
+                    elevatorList[num].updateTotalPersonInside('+', enteringPersonCount);
+                    avmFloorList[elevatorList[num].getActiveFloor()].setLog("[-] " + enteringPersonCount + "-" + temp[1] + " " + num + ". Asansör tarafından alındı. Kapasite tamamlandı.");
+
                 }
                 else break;
             }
@@ -524,19 +539,25 @@ namespace MultithreadElevator.UI
         #region EVENT
         private void threadSpeedRate_ValueChanged(object sender, EventArgs e)
         {
-            speedValue.Text = "%" + (threadSpeedRate.Value * (-10));
+            
 
             if (threadSpeedRate.Value == 10)
             {
                 sleepSpeedController = 5;
+                speedValue.Text = "%" + (threadSpeedRate.Value * (10));
+
             }
             else if (threadSpeedRate.Value > 0)
             {
                 sleepSpeedController = 100 + (threadSpeedRate.Value * -10);
+                speedValue.Text = "%" + (threadSpeedRate.Value * (10));
+
             }
             else if (threadSpeedRate.Value < 0)
             {
                 sleepSpeedController = 100 + (threadSpeedRate.Value * -50);
+                speedValue.Text = "%" + (threadSpeedRate.Value * (50));
+
             }
             else
             {
@@ -583,12 +604,12 @@ namespace MultithreadElevator.UI
         }
         private void stop_Click(object sender, EventArgs e)
         {
-            simulationIsRunning = false;
             elevatorStop(0);
             elevatorStop(1);
             elevatorStop(2);
             elevatorStop(3);
-            elevatorStop(4);
+            elevatorStop(4);            
+            simulationIsRunning = false;
             avmExitIsActive = false;
             avmLoginIsActive = false;
             queueControlIsActive = false;

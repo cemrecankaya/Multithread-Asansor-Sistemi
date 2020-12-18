@@ -277,7 +277,7 @@ namespace MultithreadElevator.Avm.elevator.Concrete
                     bool control = false;
                     foreach (int tempFloor in tempTargetableFloor)
                     {
-                        if (tempFloor > this.activeFloor)
+                        if (tempFloor > this.activeFloor && this.status == true)
                         {
                             this.setDestinationFloor(tempFloor);
                             control = true;
